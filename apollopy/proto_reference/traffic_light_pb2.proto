@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package trafficLightVis;  // Replace with your actual package name
+
+message Header {
+  // Message publishing time in seconds.
+  double timestamp_sec = 1;
+
+  // Module name.
+  string module_name = 2;
+
+  // Sequence number for each message. Each module maintains its own counter for
+  // sequence_num, always starting from 1 on boot.
+  uint32 sequence_num = 3;
+
+  // Lidar Sensor timestamp for nano-second.
+  uint64 lidar_timestamp = 4;
+
+  // Camera Sensor timestamp for nano-second.
+  uint64 camera_timestamp = 5;
+
+  // Radar Sensor timestamp for nano-second.
+  uint64 radar_timestamp = 6;
+
+  string frame_id = 9;
+}
+
+message TrafficLightBox {
+  int32 x = 1;
+  int32 y = 2;
+  int32 width = 3;
+  int32 height = 4;
+  TrafficLight.Color color = 5;
+  bool selected = 6;
+  string camera_name = 7;
+}
+
+message TrafficLightDebug {
+  TrafficLightBox cropbox = 1;
+  repeated TrafficLightBox box = 2;
+  int32 signal_num = 3;
+  int32 valid_pos = 4;
+  double ts_diff_pos = 5;
+  double ts_diff_sys = 6;
+  int32 project_error = 7;
+  double distance_to_stop_line = 8;
+  int32 camera_id = 9 [deprecated = true];
+  repeated TrafficLightBox crop_roi = 10;
+  repeated TrafficLightBox projected_roi = 11;
+  repeated TrafficLightBox rectified_roi = 12;
+  repeated TrafficLightBox debug_roi = 13;
+}
+
+message TrafficLight {
+  enum Color {
+    UNKNOWN = 0;
+    RED = 1;
+    YELLOW = 2;
+    GREEN = 3;
+    BLACK = 4;
+  }
+  Color color = 1;
+  string id = 2;
+  double confidence = 3;
+  double tracking_time = 4;
+  bool blink = 5;
+  double remaining_time = 6;
+}
+
+message TrafficLightDetection {
+  // Import the Header message if not defined in this .proto file
+  // import "header.proto";
+
+  repeated TrafficLight traffic_light = 1;
+  Header header = 2;
+  TrafficLightDebug traffic_light_debug = 3;
+
+  bool contain_lights = 4;
+  enum CameraID {
+    CAMERA_FRONT_LONG = 0;
+    CAMERA_FRONT_NARROW = 1;
+    CAMERA_FRONT_SHORT = 2;
+    CAMERA_FRONT_WIDE = 3;
+  }
+  CameraID camera_id = 5;
+
+}
