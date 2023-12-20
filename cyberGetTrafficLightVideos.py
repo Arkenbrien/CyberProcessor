@@ -27,7 +27,6 @@ from cybertools.cyberreaderlib import ProtobufFactory, RecordReader, RecordMessa
 import base64
 
 
-
 ###########################################################
 class VideoExporter:
     

@@ -13,18 +13,17 @@ from PIL import Image
 import io
 import google.protobuf as protobuf
 import google.protobuf.descriptor_pb2 as descriptor_pb2
-import record_pb2
-import proto_desc_pb2
+import apollopy.proto.record_pb2 as record_pb2
+import apollopy.proto.proto_desc_pb2 as proto_desc_pb2
 from google.protobuf.json_format import MessageToJson
-import localization_pb2 # import Uncertainty, LocalizationEstimate, LocalizationStatus
+# import apollopy.proto.localization_pb2 as localization_pb2# import Uncertainty, LocalizationEstimate, LocalizationStatus
 import json
 from tqdm import tqdm
-from cyberreaderlib import ProtobufFactory, RecordReader, RecordMessage
+from cybertools.cyberreaderlib import ProtobufFactory, RecordReader, RecordMessage
 import base64
-import piexif
 from datetime import datetime
 
-from sensor_image_pb2 import CompressedImage
+# from sensor_image_pb2 import CompressedImage
 
 
 ###########################################################
@@ -40,31 +39,19 @@ class VideoExporter:
         self.export_dimensions      = (1920,1080)
 
         self.image = None
-        # self.compression = 0.9
         self.addMeta = True
 
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.videWriter = cv2.VideoWriter("Exp34_6mm.avi", self.fourcc , 20.0, self.export_dimensions)
+        self.videWriter = cv2.VideoWriter("./videos/1698251665_6mm.avi", self.fourcc , 20.0, self.export_dimensions)
 
-
-    # Take in base64 string and return PIL image
     def stringToImage(self):
-        
         self.image = base64.b64decode(self.image)
-        
-        self.image = Image.open(io.BytesIO(self.image))
-                
-        # print()
-        
-        # self.image_ts = ???
-        
+        self.image = Image.open(io.BytesIO(self.image))        
         self.image_ts = 0
-        
         return self.image_ts
 
 
     def toRGB(self):
-        
         self.image = cv2.cvtColor(np.array(self.image), cv2.COLOR_BGR2RGB)
 
     
@@ -86,20 +73,13 @@ class VideoExporter:
 
 
 class GetMetadataToJson():
-    
     def __init__(self):
-        
         self.filename = str(round(time.time())) + ".json"
-        
         self.frames = []
         
         
     def createHeader(self, header_json):
-        
-        # self.header = header_json
-        
         self.frames = [header_json] + self.frames
-        
         pass
     
     def getMatchedLocalizationMetaData(self, ts, to_match_data):
@@ -107,14 +87,11 @@ class GetMetadataToJson():
         # Extract timestamps from the first column of localization_data (ts)
         timestamps = np.array(to_match_data)[:, 0]
         
-        # print(timestamps)
-        
         # Find the index of the closest timestamp
         closest_index = np.argmin(np.abs(timestamps - ts))
         
         # Get the closest timestamp
         # closest_timestamp = timestamps[closest_index]
-        
         localization_metadata = {
             
             'ts': to_match_data[closest_index][0],
@@ -186,7 +163,6 @@ class GetMetadataToJson():
             'steering_rate': to_match_data[closest_index][21]
             
         }
-        
         return chassis_metadata
     
     def export(self):
@@ -202,7 +178,6 @@ class GetMetadataToJson():
 class GetLocalizationData():
     
     def __init__(self) -> None:
-        
         self.localization_data = []
         
     def parseData(self, locdata):
@@ -366,11 +341,11 @@ if __name__ == "__main__":
     chassis_topic = "/apollo/canbus/chassis"
     
     # FILE LOCATION
-    # direct = "/media/travis/moleski1/cyber_bags/1698251665/"
-    direct = "/media/autobuntu/chonk/chonk/git_repos/apollo/10252023_blue_route/"
+    direct = "/mnt/h/cyber_bags/1698251665/"
+    # direct = "/media/autobuntu/chonk/chonk/git_repos/apollo/10252023_blue_route/"
 
     # VIDEO
-    showVid = False
+    showVid = True
     
     # FILE CUTOFF
     max_files_to_process = 2
