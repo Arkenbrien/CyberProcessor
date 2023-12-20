@@ -29,11 +29,10 @@ from datetime import datetime
 ###########################################################
 class VideoExporter:
     
-    def __init__(self, camera_topic):
+    def __init__(self, camera_topic, export_dir, time_set):
         
         # Topics
         self.camera_topic           = camera_topic
-        self.record_folder          = None
 
         self.export_folder          = ""
         self.export_dimensions      = (1920,1080)
@@ -42,7 +41,7 @@ class VideoExporter:
         self.addMeta = True
 
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.videWriter = cv2.VideoWriter("./videos/1698251665_6mm.avi", self.fourcc , 20.0, self.export_dimensions)
+        self.videWriter = cv2.VideoWriter(export_dir+ "/" +str(time_set) + ".avi", self.fourcc , 20.0, self.export_dimensions)
 
     def stringToImage(self):
         self.image = base64.b64decode(self.image)
@@ -73,8 +72,10 @@ class VideoExporter:
 
 
 class GetMetadataToJson():
-    def __init__(self):
-        self.filename = str(round(time.time())) + ".json"
+    def __init__(self,export_dir,time_set):
+        print(export_dir, time_set)
+        self.filename = export_dir+ "/" +str(time_set) + ".json"
+        print(self.filename)
         self.frames = []
         
         
@@ -334,22 +335,37 @@ def initReader(filename):
 if __name__ == "__main__":
     
     ### OPTIONS ###
-    
+    file_set = 1698251665
+    direct = "/media/travis/moleski1/cyber_bags/" + str(file_set)
+    export_dir = "./videos/full_route/" + str(file_set)
+
+    print(export_dir)
+
+
+    if not os.path.exists(export_dir):
+        # Create the directory if it doesn't exist
+        os.makedirs(export_dir)
+        print(f"Directory '{export_dir}' created successfully.")
+    else:
+        print(f"Directory '{export_dir}' already exists.")
+
+
     # TOPICS
-    image_handler = VideoExporter(camera_topic="/apollo/sensor/camera/front_6mm/image/compressed")
+    image_handler = VideoExporter(camera_topic="/apollo/sensor/camera/front_6mm/image/compressed", export_dir=export_dir, time_set=file_set)
     localization_topic = "/apollo/localization/pose"
     chassis_topic = "/apollo/canbus/chassis"
     
     # FILE LOCATION
-    direct = "/mnt/h/cyber_bags/1698251665/"
+    # direct = "/mnt/h/cyber_bags/1698251665/"
+    # direct = "/media/travis/moleski1/cyber_bags/1698251665"
     # direct = "/media/autobuntu/chonk/chonk/git_repos/apollo/10252023_blue_route/"
 
     # VIDEO
-    showVid = True
+    showVid = False
     
     # FILE CUTOFF
-    max_files_to_process = 2
-    early_break = True
+    max_files_to_process = 1
+    early_break = False
     
     ### VAR INIT ###
 
@@ -366,7 +382,7 @@ if __name__ == "__main__":
     
     
     # JSON INIT
-    json_export = GetMetadataToJson()
+    json_export = GetMetadataToJson(export_dir, time_set=file_set)
     
     # COUNTERS
     file_count = 0
@@ -374,7 +390,6 @@ if __name__ == "__main__":
     
     # ARRAYS
     loc_data_to_metadata = {}
-    
     
 
     ### MAIN CODE ###
@@ -392,7 +407,6 @@ if __name__ == "__main__":
 
         
         if filename.endswith('.json'):
-            
             print("FOUND METADATA IN: ", filename)
             j_file = open(filename)
             metadata = json.load(j_file)

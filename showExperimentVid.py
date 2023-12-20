@@ -64,7 +64,7 @@ def main(video_path, json_file):
 if __name__ == "__main__":
     # Specify the path to the video file and the JSON file
     video_path = "./videos/full_route/1698251665/1698251665_6mm.avi"
-    met_file = "./videos/full_route/1698251665/1698251665_6mm.json"
+    met_file = "./videos/full_route/1698251665/1698251665.json"
 
       # Run the main function
     main(video_path, met_file)
