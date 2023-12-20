@@ -51,20 +51,22 @@ db = client.cyber_data  # Replace 'your_database' with the actual name of your d
 
 # Access the collection (similar to a table in relational databases)
 collection = db.cyber_van  # Replace 'your_collection' with the actual name of your collection
+meta =  db.cyber_meta
 
-# dis_info = open("./disengagement_times/657212157f17985fbdabfd01_.json")
-# dis_info = json.load(dis_info)
+dis_info = open("./disengagement_times/6581da569c023155c2cdcbb7_.json")
+dis_info = json.load(dis_info)
 # print(dis_info)
 
-# dis_time = dis_info['disengagement_times'][0]
-# dis_dt   = dis_info['disengagement_tolerance']
-# experiment_id = dis_info['experiment_id']
+dis_time = dis_info['disengagement_times'][0]
+dis_dt   = dis_info['disengagement_tolerance']
+experiment_id = dis_info['experimentID']
+# print(experiment_id)
+# dis_time = 1698251665.5151424
+# dis_dt = 2
+# experiment_id = 34
 
-dis_time = 1698251665.5151424
-dis_dt = 2
-experiment_id = 34
-
-metadID = db['cyber_meta'].find_one({'experimentID': experiment_id})
+metadID =  meta.find_one({'experimentID': experiment_id})
+print(metadID)
 query = {
     'groupMetadataID': metadID['groupID'],
     'header.timestampSec':{"$gte": dis_time-dis_dt, "$lte":dis_time+dis_dt}

@@ -1,0 +1,51 @@
+{
+    "_id": "6581da569c023155c2cdcbb7",
+    "filename": "/mnt/h/cyber_bags/1698251665/20231025123425.record.00000",
+    "foldername": "/mnt/h/cyber_bags/1698251665",
+    "endTime": "1698251675200063896",
+    "msgnum": "9334",
+    "size": "2149362490",
+    "topics": "['/apollo/perception/traffic_light', '/apollo/planning', '/apollo/routing_request', '/apollo/monitor', '/tf', '/apollo/localization/pose', '/apollo/localization/msf_status', '/apollo/prediction', '/apollo/prediction/perception_obstacles', '/apollo/perception/obstacles', '/apollo/routing_response', '/apollo/routing_response_history', '/apollo/sensor/velodyne32/VelodyneScan', '/apollo/sensor/velodyne32/PointCloud2', '/apollo/sensor/camera/front_6mm/image', '/apollo/sensor/camera/front_6mm/image/compressed', '/apollo/sensor/camera/front_25mm/image', '/apollo/sensor/camera/front_25mm/image/compressed', '/apollo/monitor/system_status', '/apollo/control', '/apollo/common/latency_records', '/apollo/common/latency_reports', '/apollo/sensor/gnss/gnss_status', '/apollo/sensor/gnss/ins_status', '/apollo/sensor/gnss/best_pose', '/apollo/sensor/gnss/corrected_imu', '/apollo/sensor/gnss/ins_stat', '/apollo/sensor/gnss/rtk_eph', '/apollo/sensor/gnss/rtk_obs', '/apollo/sensor/gnss/heading', '/apollo/sensor/gnss/imu', '/apollo/sensor/gnss/odometry', '/apollo/sensor/gnss/stream_status', '/apollo/sensor/gnss/raw_data', '/apollo/sensor/gnss/rtcm_data', '/tf_static', '/apollo/canbus/chassis', '/apollo/canbus/chassis_detail', '/apollo/navigation', '/apollo/hmi/status', '/apollo/control/pad', '/apollo/drive_event']",
+    "type": "cyber",
+    "vehicleID": "OUPacifica",
+    "experimentID": "34",
+    "other": "{'Notes': '682 and union turn too wide', 'Weather': '71 F, partly cloudy, dry road', 'Map': 'ohio_athens_Blue_v4a'}",
+    "auto_times": [
+        [
+            1698251744.3681843,
+            1698252013.3682063
+        ],
+        [
+            1698252017.966335,
+            1698252667.6481304
+        ],
+        [
+            1698252700.067215,
+            1698253387.1881278
+        ],
+        [
+            1698253409.947402,
+            1698253457.7471094
+        ],
+        [
+            1698253480.9667082,
+            1698253570.627992
+        ]
+    ],
+    "start_auto": [
+        1698251744.3681843,
+        1698252013.3682063
+    ],
+    "end_auto": [
+        1698252017.966335,
+        1698252667.6481304
+    ],
+    "disengagement_times": [
+        1698252013.3682063,
+        1698252667.6481304,
+        1698253387.1881278,
+        1698253457.7471094,
+        1698253570.627992
+    ],
+    "disengagement_tolerance": 5
+}

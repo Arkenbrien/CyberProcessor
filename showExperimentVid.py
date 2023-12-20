@@ -14,9 +14,9 @@ def main(video_path, json_file):
     # Open video file
     cap = cv2.VideoCapture(video_path)
 
-    # if not cap.isOpened():
-    #     print("Error: Couldn't open video file.")
-    #     return
+    if not cap.isOpened():
+        print("Error: Couldn't open video file.")
+        return
 
     # Get video properties
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -44,6 +44,7 @@ def main(video_path, json_file):
         lon = round(lon,5)
 
         driving_mode = chassis['driving_mode']
+        # std = loco['']
 
         # Display values on the screen
         text = f'Frame: {frame_number}, Lat: {lat}, Lon: {lon}, Driving Mode: {driving_mode}'

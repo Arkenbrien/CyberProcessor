@@ -36,7 +36,7 @@ class VideoExporter:
         self.camera_topic    = camera_topic
         self.record_folder          = None
 
-        self.export_folder          = "./outputVideo/"
+        self.export_folder          = "./videos/traffic_light"
         self.export_dimensions      = (1920,1080)
 
         self.image = None
@@ -44,7 +44,7 @@ class VideoExporter:
         self.addMeta = True
 
         self.fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.videWriter = cv2.VideoWriter(self.export_folder+"Exp34_6mm.avi", self.fourcc , 20.0, self.export_dimensions)
+        self.videWriter = cv2.VideoWriter(self.export_folder+"/exp34.avi", self.fourcc , 20.0, self.export_dimensions)
 
 
     # Take in base64 string and return PIL image
@@ -71,16 +71,14 @@ if __name__ == "__main__":
 
     image_handler6mm = VideoExporter(camera_topic="/apollo/sensor/camera/front_6mm/image/compressed")
     image_handler25mm = VideoExporter(camera_topic="/apollo/sensor/camera/front_25mm/image/compressed")
-
     traffiLightTopic =  "/apollo/perception/traffic_light"
-
     direct = "/mnt/h/cyber_bags/1698251665/"
 
-    showVid = True
-    file_count = 0
+    showVid = False
+    # file_count = 0
     files = os.listdir(direct)
     for filename in tqdm(os.listdir(direct)):
-        # print("FILE COUNT:", file_count)
+        print(filename)
 
         filename = direct + filename
         if filename.endswith('.json'):
@@ -109,11 +107,8 @@ if __name__ == "__main__":
                     jdataTL = MessageToJson(msg)
                     jdataTL = json.loads(jdataTL)
 
-
                     if "containLights" in jdataTL:
                         cam_id = jdataTL['cameraId']
-                        print("GOT LIGHT...")
-
                         if cam_id == "CAMERA_FRONT_SHORT":
                             image_handler = image_handler6mm
                         else:
@@ -134,6 +129,7 @@ if __name__ == "__main__":
                             cv2.waitKey(1)
                 except:
                     continue
+
                 # count += 1
 
             # file_count += 1
@@ -141,5 +137,4 @@ if __name__ == "__main__":
             #     break
             
     # image_handler.export_video()
-
-            # print("Message Count %d" % count)
+    # print("Message Count %d" % count)
