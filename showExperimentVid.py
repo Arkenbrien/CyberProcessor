@@ -25,37 +25,40 @@ def main(video_path, json_file):
     # Loop through frames
     for frame_number in range(frame_count):
         # Read frame
-        frame_number += 1
+        # frame_number += 1
         ret, frame = cap.read()
         if not ret:
             print("Error reading frame.")
             break
 
-        # Get metadata for the current frame
-        frame_metadata = metadata[frame_number]
+        if frame_number > 0:
+            # Get metadata for the current frame
+            frame_metadata = metadata[frame_number]
 
-        # Extract values from metadata
-        chassis = frame_metadata.get('chassis')
-        loco    = frame_metadata.get('localization')
+            # Extract values from metadata
+            chassis = frame_metadata.get('chassis')
+            loco    = frame_metadata.get('localization')
 
-        lat,lon = utm.to_latlon(loco['pose_x'], loco['pose_y'], 17, 'S')
+            lat,lon = utm.to_latlon(loco['pose']['position']['x'], loco['pose']['position']['y'], 17, 'S')
 
-        lat = round(lat,5)
-        lon = round(lon,5)
+            lat = round(lat,5)
+            lon = round(lon,5)
 
-        driving_mode = chassis['driving_mode']
-        # std = loco['']
+            driving_mode = chassis['drivingMode']
+            speed = round(chassis['speedMps'] * 2.23694, 2)
 
-        # Display values on the screen
-        text = f'Frame: {frame_number}, Lat: {lat}, Lon: {lon}, Driving Mode: {driving_mode}'
-        cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            # std = loco['']
 
-        # Show the frame
-        cv2.imshow('Video with Metadata', frame)
+            # Display values on the screen
+            text = f'Frame: {frame_number}, Lat: {lat}, Lon: {lon}, Driving Mode: {driving_mode}, Speed (mph): {speed}'
+            cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
-        # Break the loop if the user presses 'q'
-        if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
-            break
+            # Show the frame
+            cv2.imshow('Video with Metadata', frame)
+
+            # Break the loop if the user presses 'q'
+            if cv2.waitKey(int(1000 / fps)) & 0xFF == ord('q'):
+                break
 
     # Release video capture object and close window
     cap.release()
@@ -63,8 +66,8 @@ def main(video_path, json_file):
 
 if __name__ == "__main__":
     # Specify the path to the video file and the JSON file
-    video_path = "./videos/full_route/1698251665/1698251665_6mm.avi"
-    met_file = "./videos/full_route/1698251665/1698251665.json"
+    video_path = "./videos/full_route/20231018124457/20231018124457.avi"
+    met_file = "./videos/full_route/20231018124457/20231018124457.json"
 
       # Run the main function
     main(video_path, met_file)

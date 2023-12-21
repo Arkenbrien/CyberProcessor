@@ -44,7 +44,8 @@ def drawPlots(dataList):
 
 
 # Set up MongoDB connection
-client = pymongo.MongoClient("mongodb://192.168.1.6:27017")
+# client = pymongo.MongoClient("mongodb://192.168.1.6:27017")
+client = pymongo.MongoClient("mongodb://localhost:27017")
 
 # Access the database
 db = client.cyber_data  # Replace 'your_database' with the actual name of your database
@@ -65,7 +66,7 @@ experiment_id = dis_info['experimentID']
 # dis_dt = 2
 # experiment_id = 34
 
-metadID =  meta.find_one({'experimentID': experiment_id})
+metadID =  meta.find_one({'experimentID': int(experiment_id)})
 print(metadID)
 query = {
     'groupMetadataID': metadID['groupID'],
