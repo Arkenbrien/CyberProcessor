@@ -66,15 +66,64 @@ class VideoExporter:
         print('VIDEO RELEASED') 
         print('')
 
+                
+    def color_check(self, colorState):
+        if colorState == 'GREEN':
+            color = (0,255,0)
+            cString = "green"
+        elif colorState == 'RED':
+            color = (0,0,255)
+            cString = "red"
+        elif colorState == 'YELLOW':
+            color = (0,255,255)
+            cString = "yellow"
+        else:
+            color = (0,0,0)
+            cString = "unknown"
+        return cString, color
+
+    
+    def tl_info_callback(self, tl_msg):
+        print(tl_msg)
+        self.tl_info = tl_msg
+        
+    def cropbox_printer(self, roi, bColor):
+        
+        cv2.rectangle(self.image,(roi['x'], roi['y']),(roi['x']+roi['width'], roi['y']+roi['width']),bColor, 5)
+    
+    def box_printer(self, roi, bColor):
+        for b in roi:
+            cv2.rectangle(self.image,(b['x'], b['y']),(b['x']+b['width'], b['y']+b['width']), bColor, 2)
+            
+    def debug_box_printer(self, roi, bColor):
+        
+        for b in roi:
+            cv2.rectangle(self.image,(b['x'], b['y']),(b['x']+b['width'], b['y']+b['width']),bColor, 2)
+            if hasattr(b, 'selected') and b.selected==True:
+                cv2.rectangle(self.image,(b['x'], b['y']),(b['x']+b['width'], b['y']+b['width']),(255,255,255), 2)
+                
+    def text_handler(self, cString, dString, color):
+        
+        corg = (50, 50) 
+        dorg = (50, 90) 
+        font = cv2.FONT_HERSHEY_SIMPLEX 
+        fontScale = 1
+        thickness = 2     
+        cv2.putText(self.image, cString, corg, font, fontScale, color, thickness, cv2.LINE_AA) 
+        cv2.putText(self.image, dString, dorg, font, fontScale, color, thickness, cv2.LINE_AA)
+
 ###########################################################
 if __name__ == "__main__":
 
-    image_handler6mm = VideoExporter(camera_topic="/apollo/sensor/camera/front_6mm/image/compressed")
+    image_handler6mm  = VideoExporter(camera_topic="/apollo/sensor/camera/front_6mm/image/compressed")
     image_handler25mm = VideoExporter(camera_topic="/apollo/sensor/camera/front_25mm/image/compressed")
     traffiLightTopic =  "/apollo/perception/traffic_light"
-    direct = "/mnt/h/cyber_bags/1698251665/"
 
-    showVid = False
+
+    file_set = 1698251665
+    direct = "/media/travis/moleski1/cyber_bags/" + str(file_set) + '/'
+
+    showVid = True
     # file_count = 0
     files = os.listdir(direct)
     for filename in tqdm(os.listdir(direct)):
@@ -107,12 +156,26 @@ if __name__ == "__main__":
                     jdataTL = MessageToJson(msg)
                     jdataTL = json.loads(jdataTL)
 
+                    
+
                     if "containLights" in jdataTL:
                         cam_id = jdataTL['cameraId']
                         if cam_id == "CAMERA_FRONT_SHORT":
                             image_handler = image_handler6mm
                         else:
                             image_handler = image_handler25mm
+
+                        cString, color = image_handler.color_check(jdataTL['trafficLight'][0]['color'])
+
+                        
+
+                        # image_handler.debug_box_printer(image_handler.tl_info.traffic_light_debug.box, color)
+                        
+                        cString = cString+": "+str(round(jdataTL['trafficLight'][0]['confidence'],4))
+                        dString = "distance to stop: "+str(round(jdataTL['trafficLightDebug']['distanceToStopLine'],4))
+                        
+                        image_handler.text_handler(cString, dString, color)
+
 
                 try:
                     if(message.channel_name == image_handler.camera_topic) and  "containLights" in jdataTL:
@@ -122,11 +185,24 @@ if __name__ == "__main__":
                         image_handler.image = jdata['data']
                         image_handler.stringToImage()
                         image_handler.toRGB()
+
+                        image_handler.text_handler(cString, dString, color)
+
+                        image_handler.cropbox_printer(jdataTL['trafficLightDebug']['cropbox'], color)
+                        image_handler.box_printer(jdataTL['trafficLightDebug']['cropRoi'], color)
+
+                        image_handler.box_printer(jdataTL['trafficLightDebug']['projectedRoi'], color)
+                        image_handler.box_printer(jdataTL['trafficLightDebug']['rectifiedRoi'], color)
+                        image_handler.box_printer(jdataTL['trafficLightDebug']['debugRoi'], color)
+                        image_handler.debug_box_printer(jdataTL['trafficLightDebug']['box'], color)
+
                         image_handler.add_frame()
+
+ 
 
                         if showVid:
                             cv2.imshow("Traffic Light", image_handler.image)
-                            cv2.waitKey(1)
+                            cv2.waitKey(0)
                 except:
                     continue
 
