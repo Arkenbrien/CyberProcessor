@@ -475,6 +475,7 @@ if __name__ == "__main__":
                     
                     # Append data to a frame
                     frame = {
+                        'imageHeader': imgdata['header'],
                         'localization': loc_data_to_metadata,
                         'chassis': chas_data_to_metadata
                     }
