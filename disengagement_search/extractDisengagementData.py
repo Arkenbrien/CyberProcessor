@@ -18,6 +18,8 @@ import pyvista as pv
 import pyvistaqt as pvqt
 from PyQt5.QtCore import QCoreApplication
 
+from findComments import getLatLonComments, nmeaGGA2decDeg, dms_to_dd, findNearestComment
+
 # Take in base64 string and return PIL image
 def stringToImage(base64_string):
     imgdata = base64.b64decode(base64_string)
@@ -37,9 +39,17 @@ def drawPlots(dataList):
     for data in range(len(dataList)):
         print(dataList[data]['name'])
         axes[data][0].plot(dataList[data]['time'], dataList[data]['data'])
-        axes[data][0].set_xlabel(data_list[data]['x_label'])
-        axes[data][0].set_ylabel(data_list[data]['y_label'])
+        axes[data][0].set_xlabel(dataList[data]['x_label'])
+        axes[data][0].set_ylabel(dataList[data]['y_label'])
         axes[data][0].grid(True)
+
+
+
+#IMPORT COMMENTS
+com_file = "/media/travis/moleski1/cyber_bags/1698251665/comments.json"
+com_file = open(com_file)
+com_file = json.load(com_file)
+lat_list, lon_list, probs = getLatLonComments(com_file)
 
 
 
@@ -54,11 +64,11 @@ db = client.cyber_data  # Replace 'your_database' with the actual name of your d
 collection = db.cyber_van  # Replace 'your_collection' with the actual name of your collection
 meta =  db.cyber_meta
 
-dis_info = open("./disengagement_times/6581da569c023155c2cdcbb7_.json")
+dis_info = open("./disengagement_times/34.json")
 dis_info = json.load(dis_info)
 # print(dis_info)
 
-dis_time = dis_info['disengagement_times'][0]
+dis_time = dis_info['disengagement_times'][4]
 dis_dt   = dis_info['disengagement_tolerance']
 experiment_id = dis_info['experimentID']
 # print(experiment_id)
@@ -96,11 +106,17 @@ lat = None
 lon = None
 std_2d = None
 driving_mode = None
+comment = "NONE"
 
 master_cloud_x = []
 master_cloud_y = []
 master_cloud_z = []
 master_cloud_i = []
+
+master_obs_x = []
+master_obs_y = []
+master_obs_z = []
+master_obs_c = []
 
 num_sat_obj = {
     'time': [],
@@ -118,7 +134,35 @@ std_obj = {
     'y_label': 'GNSS Position STD (m)'
 }
 
-data_list = []
+spd_obj = {
+    'time': [],
+    'data': [],
+    'name': "Speed (mph)",
+    'x_label': 'time (s)',
+    'y_label': 'Speed (mph)'
+}
+
+steer_obj = {
+    'time': [],
+    'data': [],
+    'name': "Steering)",
+    'x_label': 'time (s)',
+    'y_label': 'steering percentage)'
+}
+
+brake_obj = {
+    'time': [],
+    'data': [],
+    'name': "Brake",
+    'x_label': 'time (s)',
+    'y_label': 'Braking Percentage'
+}
+
+
+
+gnss_list    = []
+chassis_list = []
+
 print("STARTING LOOP...")
 for document in tqdm(result):
     # print(document)
@@ -132,9 +176,11 @@ for document in tqdm(result):
         cv2.putText(rgb_im, ("(") + str(lat) + ', ' +str(lon) +  (")"), (10,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(rgb_im, 'STD: '+ str(std_2d), (10,150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(rgb_im, str(driving_mode), (10,200), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-        # cv2.putText(rgb_im, 'Experiment: '+dis_info['experimentID'], (10,250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-        # cv2.putText(rgb_im, dis_info['vehicleID'], (10,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
-        # cv2.putText(rgb_im, dis_info['other'], (10,1050), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(rgb_im, 'Experiment: '+dis_info['experimentID'], (10,250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(rgb_im, dis_info['vehicleID'], (10,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+
+        cv2.putText(rgb_im, dis_info['other'], (10,1050), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(rgb_im, comment, (10,1015), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
 
         cv2.imshow(str(document['topic']), rgb_im)
         cv2.waitKey(1)
@@ -142,6 +188,10 @@ for document in tqdm(result):
     if document['topic'] == "/apollo/localization/pose" and get_pose:
         vehicle_position = document['pose']['position']
         lat, lon = utm.to_latlon(vehicle_position['x'], vehicle_position['y'], 17,'S')
+        comment = findNearestComment(lat,lon,lat_list, lon_list, probs)
+
+        # print("COMMENT", comment)
+
         roll  = document['pose']['eulerAngles']['x']
         pitch = document['pose']['eulerAngles']['y']
         yaw   = document['pose']['eulerAngles']['z'] + np.pi/2
@@ -163,7 +213,6 @@ for document in tqdm(result):
 
 
     if document['topic'] == '/apollo/sensor/velodyne32/PointCloud2':
-        # p.clear()
         if get_lidar:
             x_master = np.zeros(len(document['point']))
             y_master = np.zeros(len(document['point']))
@@ -194,15 +243,24 @@ for document in tqdm(result):
     if document['topic'] == "/apollo/perception/obstacles" and get_obstacles:
         # p.clear()
         # p.update()
-        for obs in document['perceptionObstacle']:
-            obs_point = np.array([obs['position']['x'],obs['position']['y'],obs['position']['z']])
-            if obs['type'] == 'VEHICLE':
-                c = 'blue'
-            else:
-                c = 'green'
-            boxO = pv.Cube(center=(obs_point),x_length=obs['length'] , y_length=obs['width'], z_length= obs['height'])
-            boxRot = boxO.rotate_z(angle=np.rad2deg(obs['theta']),point=obs_point)
-            p.add_mesh(boxRot, color=c, show_edges=True)
+
+        if "perceptionObstacle" in document:
+            for obs in document['perceptionObstacle']:
+                # obs_point = np.array([obs['position']['x'],obs['position']['y'],obs['position']['z']])
+                if obs['type'] == 'VEHICLE':
+                    c = 'blue'
+                else:
+                    c = 'green'
+
+                master_obs_x.append(obs['position']['x'])
+                master_obs_y.append(obs['position']['y'])
+                master_obs_z.append(obs['position']['z'])
+                master_obs_c.append(c)
+
+
+                # boxO = pv.Cube(center=(obs_point),x_length=obs['length'] , y_length=obs['width'], z_length= obs['height'])
+                # boxRot = boxO.rotate_z(angle=np.rad2deg(obs['theta']),point=obs_point)
+                # p.add_mesh(boxRot, color=c, show_edges=True)
 
     if document['topic'] == "/apollo/sensor/gnss/best_pose" and get_gnss:
         sol_type =document['solType']
@@ -225,7 +283,18 @@ for document in tqdm(result):
 
     if document['topic'] == "/apollo/canbus/chassis":
         driving_mode = document['drivingMode']
-        # print(document)
+
+        speed = round(document['speedMps'] * 2.23694, 2)
+
+        spd_obj['time'].append(document['header']['timestampSec'])
+        spd_obj['data'].append(speed)
+
+        steer_obj['time'].append(document['header']['timestampSec'])
+        steer_obj['data'].append(document['steeringPercentage'])
+
+        brake_obj['time'].append(document['header']['timestampSec'])
+        brake_obj['data'].append(document['brakePercentage'])
+
 
     # loopEnd = time.time()
     # rate_loop = 1 / (loopEnd - loopStart)
@@ -236,11 +305,15 @@ for document in tqdm(result):
 
     QCoreApplication.processEvents()
 
-data_list.append(num_sat_obj)
-data_list.append(std_obj)
+gnss_list.append(num_sat_obj)
+gnss_list.append(std_obj)
 
-drawPlots(data_list)
-print(data_list)
+chassis_list.append(spd_obj)
+chassis_list.append(brake_obj)
+chassis_list.append(steer_obj)
+
+drawPlots(gnss_list)
+drawPlots(chassis_list)
 
 print("DRAWING MASTER CLOUD")
 point_cloud = pv.PolyData(np.column_stack((master_cloud_x, master_cloud_y, master_cloud_z)))
@@ -248,6 +321,14 @@ point_cloud['intensity'] = master_cloud_i
 point_cloud.plot(point_cloud, cmap='jet', render_points_as_spheres=True)
 p.add_points(point_cloud)
 print("DREW CLOUD???")
+
+obstacles = pv.PolyData(np.column_stack((master_obs_x, master_obs_y, master_obs_z)))
+# obstacles['intensity'] = master_obs_c
+obstacles.plot(obstacles, cmap='jet', render_points_as_spheres=True)
+p.add_points(obstacles)
+
+
+
 
 try:
     while True:

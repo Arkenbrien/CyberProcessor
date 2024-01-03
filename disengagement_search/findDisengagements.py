@@ -13,7 +13,7 @@ dt = 5
     
 ### GET MONGO DATA ###
 ### REPLACE WITH DESIRED MONGODB INFO ###
-myclient = pymongo.MongoClient("mongodb://192.168.1.6:27017")
+myclient = pymongo.MongoClient("mongodb://localhost:27017")
 mydb = myclient["cyber_data"]
 db_data = mydb["cyber_van"]
 db_metadata = mydb["cyber_meta"]
@@ -134,7 +134,7 @@ class ChassisSearch:
     
     def jsonAutoTimesExport(self):
         
-        json_export_filename = str(self.id) + "_.json"
+        json_export_filename = self.experimentID + ".json"
         
         self.auto_start = self.auto_times[0][:]
         self.auto_end   = self.auto_times[1][:]
