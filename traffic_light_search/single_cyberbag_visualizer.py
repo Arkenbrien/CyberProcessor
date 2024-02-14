@@ -48,16 +48,16 @@ class traffic_img_listener:
         
     def color_check(self, colorState):
         
-        if colorState == 3:
+        if colorState == 'GREEN':
             color = (0,255,0)
             cString = "green"
-        elif colorState == 1:
+        elif colorState == 'RED':
             color = (0,0,255)
             cString = "red"
-        elif colorState == 2:
+        elif colorState == 'YELLOW':
             color = (0,255,255)
             cString = "yellow"
-        elif colorState == 0:
+        else:
             color = (0,0,0)
             cString = "unknown"
         return cString, color

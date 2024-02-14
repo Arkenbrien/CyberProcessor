@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -19,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='proto/proto_desc.proto',
   package='apollo.cyber.proto',
   syntax='proto2',
+  serialized_options=None,
   serialized_pb=_b('\n\x16proto/proto_desc.proto\x12\x12\x61pollo.cyber.proto\"N\n\tProtoDesc\x12\x0c\n\x04\x64\x65sc\x18\x01 \x01(\x0c\x12\x33\n\x0c\x64\x65pendencies\x18\x02 \x03(\x0b\x32\x1d.apollo.cyber.proto.ProtoDesc')
 )
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
@@ -39,21 +38,21 @@ _PROTODESC = _descriptor.Descriptor(
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='dependencies', full_name='apollo.cyber.proto.ProtoDesc.dependencies', index=1,
       number=2, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
   nested_types=[],
   enum_types=[
   ],
-  options=None,
+  serialized_options=None,
   is_extendable=False,
   syntax='proto2',
   extension_ranges=[],
@@ -65,6 +64,7 @@ _PROTODESC = _descriptor.Descriptor(
 
 _PROTODESC.fields_by_name['dependencies'].message_type = _PROTODESC
 DESCRIPTOR.message_types_by_name['ProtoDesc'] = _PROTODESC
+_sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ProtoDesc = _reflection.GeneratedProtocolMessageType('ProtoDesc', (_message.Message,), dict(
   DESCRIPTOR = _PROTODESC,

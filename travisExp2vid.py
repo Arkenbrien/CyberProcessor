@@ -113,8 +113,8 @@ def initReader(filename):
 if __name__ == "__main__":
     
     ### OPTIONS ###
-    file_set = 1698251665
-    direct = "/media/travis/moleski1/cyber_bags/" + str(file_set)
+    file_set = 20230621150429
+    direct = "/media/travis/moleski1/forTony/" + str(file_set)
 
     # direct = "/home/travis/Work/Apollo/apollo5/apollo5.5/apollo-5.5.0/data/bag/trafficlight"
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     # direct = "/media/autobuntu/chonk/chonk/git_repos/apollo/10252023_blue_route/"
 
     # VIDEO
-    showVid = False
+    showVid = True
     
     # FILE CUTOFF
     max_files_to_process = 1

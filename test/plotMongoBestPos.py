@@ -31,7 +31,7 @@ position_y = []
 
 color = [[255,0,255]]
 
-experiment_id = 34
+experiment_id = 39
 metadID = db['cyber_meta'].find_one({'experimentID': experiment_id})
 # metadID['groupID']
 # print(metadID['groupID'])

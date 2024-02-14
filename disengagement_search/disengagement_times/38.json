@@ -1,0 +1,78 @@
+{
+    "_id": "65b3d8727444943813544425",
+    "filename": "/media/travis/moleski1/cyber_bags/blue_012224_1/20240122142859.record.00000",
+    "foldername": "/media/travis/moleski1/cyber_bags/blue_012224_1",
+    "endTime": "1705951750989452835",
+    "msgnum": "9730",
+    "size": "2149601939",
+    "topics": "['/apollo/perception/traffic_light', '/apollo/planning', '/apollo/routing_request', '/apollo/monitor', '/tf', '/apollo/localization/pose', '/apollo/localization/msf_status', '/apollo/control', '/apollo/common/latency_records', '/apollo/sensor/velodyne32/VelodyneScan', '/apollo/sensor/velodyne32/PointCloud2', '/apollo/sensor/gnss/gnss_status', '/apollo/sensor/gnss/ins_status', '/apollo/sensor/gnss/best_pose', '/apollo/sensor/gnss/corrected_imu', '/apollo/sensor/gnss/ins_stat', '/apollo/sensor/gnss/rtk_eph', '/apollo/sensor/gnss/rtk_obs', '/apollo/sensor/gnss/heading', '/apollo/sensor/gnss/imu', '/apollo/sensor/gnss/odometry', '/apollo/sensor/gnss/stream_status', '/apollo/sensor/gnss/raw_data', '/apollo/sensor/gnss/rtcm_data', '/apollo/prediction', '/apollo/prediction/perception_obstacles', '/tf_static', '/apollo/canbus/chassis', '/apollo/sensor/camera/front_6mm/image', '/apollo/sensor/camera/front_6mm/image/compressed', '/apollo/sensor/camera/front_25mm/image', '/apollo/sensor/camera/front_25mm/image/compressed', '/apollo/monitor/system_status', '/apollo/common/latency_reports', '/apollo/routing_response', '/apollo/routing_response_history', '/apollo/canbus/chassis_detail', '/apollo/perception/obstacles', '/apollo/navigation', '/apollo/hmi/status', '/apollo/control/pad', '/apollo/drive_event']",
+    "type": "cyber",
+    "vehicleID": "OUPacifica",
+    "experimentID": "38",
+    "other": "{'Notes': 'delayed path on courtstreet, fixed on west union', 'Weather': '40 F, partly cloudly, dry roads', 'Map': 'ohio_athens_blue_v4a'}",
+    "auto_times": [
+        [
+            1705952015.9146745,
+            1705952068.7556767
+        ],
+        [
+            1705952087.31603,
+            1705952206.4748666
+        ],
+        [
+            1705952329.9946873,
+            1705952806.175103
+        ],
+        [
+            1705952816.0954196,
+            1705952860.9758995
+        ],
+        [
+            1705952885.5143824,
+            1705952962.7745962
+        ],
+        [
+            1705952971.0356,
+            1705953032.9346619
+        ],
+        [
+            1705953098.7345965,
+            1705953180.3551695
+        ],
+        [
+            1705953196.936086,
+            1705953365.554757
+        ],
+        [
+            1705953405.6961982,
+            1705953424.4943495
+        ],
+        [
+            1705953459.015974,
+            1705953513.8346455
+        ],
+        [
+            1705953544.7346935,
+            1705953569.5147672
+        ],
+        [
+            1705953632.433894,
+            1705953835.6746926
+        ]
+    ],
+    "disengagement_times": [
+        1705952068.7556767,
+        1705952206.4748666,
+        1705952806.175103,
+        1705952860.9758995,
+        1705952962.7745962,
+        1705953032.9346619,
+        1705953180.3551695,
+        1705953365.554757,
+        1705953424.4943495,
+        1705953513.8346455,
+        1705953569.5147672,
+        1705953835.6746926
+    ],
+    "disengagement_tolerance": 5
+}

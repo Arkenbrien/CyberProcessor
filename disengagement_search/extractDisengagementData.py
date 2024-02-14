@@ -46,11 +46,10 @@ def drawPlots(dataList):
 
 
 #IMPORT COMMENTS
-com_file = "/media/travis/moleski1/cyber_bags/1698251665/comments.json"
+com_file = "/media/travis/moleski1/cyber_bags/blue_012224_1/comments.json"
 com_file = open(com_file)
 com_file = json.load(com_file)
 lat_list, lon_list, probs = getLatLonComments(com_file)
-
 
 
 # Set up MongoDB connection
@@ -64,11 +63,11 @@ db = client.cyber_data  # Replace 'your_database' with the actual name of your d
 collection = db.cyber_van  # Replace 'your_collection' with the actual name of your collection
 meta =  db.cyber_meta
 
-dis_info = open("./disengagement_times/34.json")
+dis_info = open("./disengagement_times/38.json")
 dis_info = json.load(dis_info)
 # print(dis_info)
 
-dis_time = dis_info['disengagement_times'][4]
+dis_time = dis_info['disengagement_times'][1]
 dis_dt   = dis_info['disengagement_tolerance']
 experiment_id = dis_info['experimentID']
 # print(experiment_id)
@@ -77,7 +76,6 @@ experiment_id = dis_info['experimentID']
 # experiment_id = 34
 
 metadID =  meta.find_one({'experimentID': int(experiment_id)})
-print(metadID)
 query = {
     'groupMetadataID': metadID['groupID'],
     'header.timestampSec':{"$gte": dis_time-dis_dt, "$lte":dis_time+dis_dt}
@@ -163,14 +161,31 @@ brake_obj = {
 gnss_list    = []
 chassis_list = []
 
+
+output_video = 'exp38Dis1.avi'
+fps = 20
+video_writer = cv2.VideoWriter(output_video, cv2.VideoWriter_fourcc(*'DIVX'), fps, (1920, 1080))
+
+string_new = ''
+for letter in dis_info['other']:
+    if letter == '\'':
+        fix = '\"'
+    else:
+        fix = letter
+    string_new += fix
+
+other_info = json.loads(string_new)
+print(other_info)
+
 print("STARTING LOOP...")
-for document in tqdm(result):
+for document in result:
     # print(document)
     # loopStart = time.time()
     # print(document['topic'],"\n")
     if document['topic'] == "/apollo/sensor/camera/front_6mm/image/compressed" and get_im:
         pil_im = stringToImage(document['data'])
         rgb_im = toRGB(pil_im)
+
 
         cv2.putText(rgb_im, sol_type, (10,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(rgb_im, ("(") + str(lat) + ', ' +str(lon) +  (")"), (10,100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
@@ -179,10 +194,13 @@ for document in tqdm(result):
         cv2.putText(rgb_im, 'Experiment: '+dis_info['experimentID'], (10,250), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(rgb_im, dis_info['vehicleID'], (10,300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
 
-        cv2.putText(rgb_im, dis_info['other'], (10,1050), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+        cv2.putText(rgb_im, other_info['Map'], (10,1050), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(rgb_im, comment, (10,1015), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
 
         cv2.imshow(str(document['topic']), rgb_im)
+
+        video_writer.write(rgb_im)
+
         cv2.waitKey(1)
 
     if document['topic'] == "/apollo/localization/pose" and get_pose:
@@ -305,6 +323,11 @@ for document in tqdm(result):
 
     QCoreApplication.processEvents()
 
+
+video_writer.release()
+
+print(f"Video '{output_video}' created successfully.")
+
 gnss_list.append(num_sat_obj)
 gnss_list.append(std_obj)
 
@@ -326,9 +349,6 @@ obstacles = pv.PolyData(np.column_stack((master_obs_x, master_obs_y, master_obs_
 # obstacles['intensity'] = master_obs_c
 obstacles.plot(obstacles, cmap='jet', render_points_as_spheres=True)
 p.add_points(obstacles)
-
-
-
 
 try:
     while True:

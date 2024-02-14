@@ -5,26 +5,14 @@ import csv
 import time
 import numpy as np
 import json
-
-
-### OPTIONS ###
-# Set how much time in seconds before and after the autonomous driving disengament
-dt = 5
-    
-### GET MONGO DATA ###
-### REPLACE WITH DESIRED MONGODB INFO ###
-myclient = pymongo.MongoClient("mongodb://localhost:27017")
-mydb = myclient["cyber_data"]
-db_data = mydb["cyber_van"]
-db_metadata = mydb["cyber_meta"]
         
 class ChassisSearch:
     
-    def __init__(self):
-        
+    def __init__(self, metadID):
+
         ### VAR INIT ###
         self.auto_times = []
-        self.query = {'topic': '/apollo/canbus/chassis'}
+        self.query = {'groupMetadataID': metadID['groupID'], 'topic': '/apollo/canbus/chassis'}
         self.chassis_data = []
         self.disengagement_times = []
         
@@ -135,9 +123,11 @@ class ChassisSearch:
     def jsonAutoTimesExport(self):
         
         json_export_filename = self.experimentID + ".json"
+
+        print("EXPORT TIMES:", self.auto_times)
         
-        self.auto_start = self.auto_times[0][:]
-        self.auto_end   = self.auto_times[1][:]
+        # self.auto_start = self.auto_times[0][:]
+        # self.auto_end   = self.auto_times[1][:]
 
         for time_range in auto_times:
             self.disengagement_times.append(time_range[1])
@@ -155,8 +145,6 @@ class ChassisSearch:
             'experimentID': self.experimentID,
             'other': self.other,
             'auto_times': self.auto_times,
-            'start_auto': self.auto_start,
-            'end_auto': self.auto_end,
             'disengagement_times':self.disengagement_times,
             'disengagement_tolerance':dt
         }
@@ -211,11 +199,26 @@ class ChassisSearch:
 
 
 if __name__ == '__main__':
+    ### OPTIONS ###
+    # Set how much time in seconds before and after the autonomous driving disengament
+    dt = 5
+        
+    ### GET MONGO DATA ###
+    ### REPLACE WITH DESIRED MONGODB INFO ###
+    myclient = pymongo.MongoClient("mongodb://localhost:27017")
+    mydb = myclient["cyber_data"]
+
+    db_data = mydb["cyber_van"]
+    db_metadata = mydb["cyber_meta"]
+
+    metadID = mydb["cyber_meta"].find_one({'experimentID': 39})
+
+    print(metadID['groupID'])
     
     print('Starting search for auto -> manual! :D')
     print('Getting disegagment timestamps')
     
-    auto_times_instance = ChassisSearch()
+    auto_times_instance = ChassisSearch(metadID)
     chassis_data = auto_times_instance.mongodbChassisSearch()
     auto_times = auto_times_instance.disengagmentSearch()
     metadata_base_json = auto_times_instance.getMetaData(db_metadata)
