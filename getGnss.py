@@ -1,6 +1,7 @@
 import pymongo
 import json
-
+from bson.json_util import dumps
+import os
 
 # Set up MongoDB connection
 # client = pymongo.MongoClient("mongodb://192.168.1.6:27017")
@@ -13,37 +14,43 @@ db = client.cyber_data  # Replace 'your_database' with the actual name of your d
 collection = db.cyber_van  # Replace 'your_collection' with the actual name of your collection
 meta =  db.cyber_meta
 
-metadID = meta.find_one({'experimentID': 39})
+exp_id_list = [1,2,3,4,5,6,7]
+topic_list = ['/apollo/localization/pose',
+            "/apollo/sensor/gnss/gnss_status",
+            "/apollo/sensor/gnss/ins_status",
+            "/apollo/sensor/gnss/best_pose",
+            "/apollo/sensor/gnss/corrected_imu",
+            "/apollo/sensor/gnss/ins_stat",
+            "/apollo/sensor/gnss/rtk_eph",
+            "/apollo/sensor/gnss/rtk_obs",
+            "/apollo/sensor/gnss/heading",
+            "/apollo/sensor/gnss/imu",
+            "/apollo/sensor/gnss/odometry",
+            "/apollo/sensor/gnss/stream_status",
+            "/apollo/sensor/gnss/raw_data",
+            "/apollo/sensor/gnss/rtcm_data"
+]
 
-print(metadID['groupID'])
+for exp_id in exp_id_list:
+    metadID = meta.find_one({'experimentID': exp_id})
 
-query = {'groupMetadataID': metadID['groupID'], 'topic': '/apollo/sensor/gnss/raw_data'}
+    print(metadID['groupMetadataID'])
 
-result = collection.find(query)
+    for topic in topic_list:
 
+        query = {'groupMetadataID': metadID['groupMetadataID'], 
+                'topic': topic}
 
-print(result)
+        result = list(collection.find(query))
 
-store_obj = {
-    "time": [],
-     "raw": []
-}
+        dirName = f"./exp_{exp_id}"
 
-count = 0
-for i in result:
-    print(i['data'])
-    print(i['time'])
+        try:  
+            os.mkdir(dirName)  
+        except OSError as error:  
+            print("DIR ALREADY THERE")
 
-    store_obj['time'].append(i['time'])
-    store_obj['raw'].append(i['data'])
-
-    count += 1
-
-    if count > 5:
-        break
-
-json_object = json.dumps(store_obj, indent=4)
-print(json_object)
-
-with open("experiment39_rawGNSS.json", "w") as outfile:
-    outfile.write(json_object)
+        t = topic.split("/")[-1]
+        json_object = dumps(result, indent=4)
+        with open(f"{dirName}/EXP{exp_id}_{t}.json", "w") as outfile:
+            outfile.write(json_object)
